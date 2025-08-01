@@ -1,0 +1,10 @@
+{
+  "herobrine_sound": {
+    "sounds": [
+      {
+        "name": "beyondus:sounds/herobrine_sound",
+        "stream": false
+      }
+    ]
+  }
+}
