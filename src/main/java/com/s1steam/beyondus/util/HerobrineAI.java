@@ -70,7 +70,8 @@ public class HerobrineAI {
     private void attackPlayer(Player player) {
         herobrine.getNavigation().moveTo(player, 1.2);
         if (herobrine.distanceTo(player) < 2.5) {
-            player.hurt(net.minecraft.world.damagesource.DamageSource.mobAttack(herobrine), 4.0F);
+            player.hurt(herobrine.damageSources().mobAttack(herobrine), 4.0F);
+            
             player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Херобрин атакует тебя!"));
         }
     }
