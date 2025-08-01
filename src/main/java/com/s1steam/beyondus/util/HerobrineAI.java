@@ -61,8 +61,8 @@ public class HerobrineAI {
     private void scarePlayer(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.connection.send(new ClientboundSoundPacket(
-             BuiltInRegistries.SOUND_EVENT.wrapAsHolder(MySounds.HEROBRINE_SOUND),
-             SoundSource.HOSTILE, x, y, z, 1.0F, 1.0F, 0L));
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(MySounds.HEROBRINE_SOUND),
+                SoundSource.HOSTILE, x, y, z, 1.0F, 1.0F, 0L));
             
             player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Ты слышишь странные звуки..."));
         }
