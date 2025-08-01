@@ -1,31 +1,23 @@
 package com.s1steam.beyondus.entity;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fmlclient.registry.RenderingRegistry;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.MobRenderer;
 
 public class EntityHerobrine extends Monster {
 
@@ -33,9 +25,8 @@ public class EntityHerobrine extends Monster {
 
     public static final RegistryObject<EntityType<EntityHerobrine>> HEROBRINE = ENTITY_TYPES.register("herobrine",
         () -> EntityType.Builder.of(EntityHerobrine::new, MobCategory.MONSTER)
-                .sized(0.6F, 1.95F)
-                .build()
-    );
+            .sized(0.6F, 1.95F)
+            .build(new ResourceLocation("beyondus", "herobrine").toString()));
 
     public EntityHerobrine(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -44,13 +35,13 @@ public class EntityHerobrine extends Monster {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.0));
-        this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        this.goalSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.RandomStrollGoal(this, 1.0));
+        this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(this, Player.class, 8.0F));
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
@@ -59,7 +50,7 @@ public class EntityHerobrine extends Monster {
         private static final ResourceLocation TEXTURE = new ResourceLocation("beyondus:textures/entity/herobrine.png");
 
         public Render(EntityRendererProvider.Context context) {
-            super(context, new HerobrineModel(context.bakeLayer(HerobrineModel.LAYER_LOCATION)), 0.5f);
+            super(context, new HerobrineModel(context.bakeLayer(LAYER_LOCATION)), 0.5f);
         }
 
         @Override
@@ -68,11 +59,15 @@ public class EntityHerobrine extends Monster {
         }
     }
 
-    public static void register(IEventBus bus) {
-        ENTITY_TYPES.register(bus);
+    // Модель и её регистрация
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("beyondus", "herobrine"), "main");
+
+    public static LayerDefinition createBodyLayer() {
+        var mesh = net.minecraft.client.model.HumanoidModel.createMesh(new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F), 0.0F);
+        return LayerDefinition.create(mesh, 64, 64);
     }
 
-    public static void registerRenderers(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(HEROBRINE.get(), Render::new);
+    public static void register(IEventBus bus) {
+        ENTITY_TYPES.register(bus);
     }
 }
