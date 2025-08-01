@@ -12,10 +12,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -23,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 public class EntityHerobrine extends Monster {
 
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, "beyondus");
+
     public static final RegistryObject<EntityType<EntityHerobrine>> HEROBRINE = ENTITY_TYPES.register("herobrine",
             () -> EntityType.Builder.of(EntityHerobrine::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.95F)
@@ -47,7 +50,7 @@ public class EntityHerobrine extends Monster {
 
     @OnlyIn(Dist.CLIENT)
     public static class Render extends MobRenderer<EntityHerobrine, HerobrineModel> {
-        private static final ResourceLocation TEXTURE = new ResourceLocation("beyondus:textures/entity/herobrine.png");
+        private static final ResourceLocation TEXTURE = new ResourceLocation("beyondus", "textures/entity/herobrine.png");
 
         public Render(EntityRendererProvider.Context context) {
             super(context, new HerobrineModel(context.bakeLayer(HerobrineModel.LAYER_LOCATION)), 0.5f);
@@ -61,5 +64,10 @@ public class EntityHerobrine extends Monster {
 
     public static void register(IEventBus bus) {
         ENTITY_TYPES.register(bus);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void registerRenderers(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(HEROBRINE.get(), Render::new);
     }
 }
