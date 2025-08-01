@@ -50,7 +50,7 @@ public class EntityHerobrine extends Monster {
         ENTITY_TYPES.register(bus);
     }
 
-    // Рендерер
+    // Рендер для клиента
     public static class Render extends MobRenderer<EntityHerobrine, HerobrineModel<EntityHerobrine>> {
 
         private static final ResourceLocation TEXTURE = new ResourceLocation("herobrinemod", "textures/entity/herobrine.png");
