@@ -1,8 +1,6 @@
 package com.s1steam.beyondus;
 
 import com.s1steam.beyondus.entity.EntityHerobrine;
-import com.s1steam.beyondus.registry.MySounds;
-
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -20,12 +18,9 @@ public class HerobrineMod {
         // Регистрируем сущность
         EntityHerobrine.register(modEventBus);
 
-        // Регистрируем звуки (если есть)
-        MySounds.register(modEventBus);
-
-        // Регистрируем рендеры только на клиенте
+        // Регистрируем рендеры и слои только на клиенте
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            modEventBus.addListener(EntityHerobrine::registerRenderers);
+            // Клиентские события обрабатываются через ClientModEvents
         }
 
         MinecraftForge.EVENT_BUS.register(this);
