@@ -1,71 +1,80 @@
 package com.s1steam.beyondus.entity;
 
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-public class EntityHerobrine extends Monster {
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.client.model.geom.builders.PartPose;
+import net.minecraft.client.model.HumanoidModel;
 
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, "beyondus");
+public class HerobrineModel extends HumanoidModel<EntityHerobrine> {
 
-    public static final RegistryObject<EntityType<EntityHerobrine>> HEROBRINE = ENTITY_TYPES.register("herobrine",
-            () -> EntityType.Builder.of(EntityHerobrine::new, MobCategory.MONSTER)
-                    .sized(0.6F, 1.95F)
-                    .build(new ResourceLocation("beyondus", "herobrine").toString()));
+    public HerobrineModel(ModelPart root) {
+        super(root);
+    }
 
-    public EntityHerobrine(EntityType<? extends Monster> type, Level level) {
-        super(type, level);
-        this.setNoAi(false);
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
+
+        // Туловище
+        partdefinition.addOrReplaceChild("body",
+            CubeListBuilder.create()
+                .texOffs(16, 16)
+                .addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4),
+            PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        // Голова
+        partdefinition.addOrReplaceChild("head",
+            CubeListBuilder.create()
+                .texOffs(0, 0)
+                .addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8),
+            PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        // Левая рука
+        partdefinition.addOrReplaceChild("left_arm",
+            CubeListBuilder.create()
+                .texOffs(32, 48)
+                .addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4),
+            PartPose.offset(5.0F, 2.0F, 0.0F));
+
+        // Правая рука
+        partdefinition.addOrReplaceChild("right_arm",
+            CubeListBuilder.create()
+                .texOffs(40, 16)
+                .addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4),
+            PartPose.offset(-5.0F, 2.0F, 0.0F));
+
+        // Левая нога
+        partdefinition.addOrReplaceChild("left_leg",
+            CubeListBuilder.create()
+                .texOffs(16, 48)
+                .addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4),
+            PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        // Правая нога
+        partdefinition.addOrReplaceChild("right_leg",
+            CubeListBuilder.create()
+                .texOffs(0, 16)
+                .addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4),
+            PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        return LayerDefinition.create(meshdefinition, 64, 64);
     }
 
     @Override
-    protected void registerGoals() {
-        this.goalSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.0));
-        this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
+    public void setupAnim(EntityHerobrine entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        // Здесь можно добавить кастомные анимации
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay,
+                               float red, float green, float blue, float alpha) {
+        super.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
-
-    @OnlyIn(Dist.CLIENT)
-    public static class Render extends MobRenderer<EntityHerobrine, HerobrineModel> {
-        private static final ResourceLocation TEXTURE = new ResourceLocation("beyondus:textures/entity/herobrine.png");
-
-        public Render(EntityRendererProvider.Context context) {
-            super(context, new HerobrineModel(context.bakeLayer(HerobrineModel.LAYER_LOCATION)), 0.5f);
-        }
-
-        @Override
-        public ResourceLocation getTextureLocation(EntityHerobrine entity) {
-            return TEXTURE;
-        }
-    }
-
-    public static void register(IEventBus bus) {
-        ENTITY_TYPES.register(bus);
-    }
-
-    public static void registerRenderers(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(HEROBRINE.get(), Render::new);
-    }
-}
+                                         }
