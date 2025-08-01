@@ -12,7 +12,7 @@ public class HerobrineEventHandler {
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         Player player = event.getPlayer();
         // Пример: отправить игроку сообщение или запустить что-то при входе
-        if (!player.level.isClientSide()) {
+        if (!player.level().isClientSide()) {
             player.sendSystemMessage(
                 net.minecraft.network.chat.Component.literal("Welcome to the Herobrine mod! Beware..."));
         }
